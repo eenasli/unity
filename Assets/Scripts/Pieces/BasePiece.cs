@@ -72,8 +72,21 @@ public abstract class BasePiece : EventTrigger
             currentX += xDirection;
             currentY += yDirection;
 
-            //TODO: Get the state of the target cell
+            //Get the state of the targ
+            CellState cellState = CellState.None;
+            cellState = mCurrentCell.mBoard.ValidateCell(currentX, currentY, this);
 
+            //If Enemy add to list, break
+            if(cellState == CellState.Enemy)
+            {
+                mHighlightedCells.Add(mCurrentCell.mBoard.mAllCells[currentX, currentY]);
+                break;
+            }
+
+            //If the cell is not free, break
+            if (cellState != CellState.Free)
+                break;
+                
             //Add to list
             mHighlightedCells.Add(mCurrentCell.mBoard.mAllCells[currentX, currentY]);
         }
@@ -175,12 +188,14 @@ public abstract class BasePiece : EventTrigger
         if (!mTargetCell)
         {
             transform.position = mCurrentCell.gameObject.transform.position;
+            return;
         }
 
         //Move to new Cell
         Move();
 
-        //TODO: End turn
+        //End turn
+        mPieceManager.switchSides(mColor);
     }
     #endregion 
 

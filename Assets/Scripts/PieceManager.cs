@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class PieceManager : MonoBehaviour
 {
+    [HideInInspector]
+    public bool mIsKingAlive = true;
+
     public GameObject piecePrefab;
 
     private List<BasePiece> mWhitePieces = null;
@@ -28,7 +31,7 @@ public class PieceManager : MonoBehaviour
     public void Setup(Board board)
     {
         //Create white piece
-        mWhitePieces = CreatePieces(Color.white, new Color32(80,124,159,255), board);
+        mWhitePieces = CreatePieces(Color.white, new Color32(80, 124, 159, 255), board);
         // Create Black piece
         mBlackPieces = CreatePieces(Color.black, new Color32(210, 95, 64, 255), board);
 
@@ -52,7 +55,7 @@ public class PieceManager : MonoBehaviour
             newPieceObject.transform.SetParent(transform);
 
             // Set scale and position
-            newPieceObject.transform.localScale = new Vector3(1,1,1);
+            newPieceObject.transform.localScale = new Vector3(1, 1, 1);
             newPieceObject.transform.localRotation = Quaternion.identity;
 
             //Get the type, apply to new object
@@ -79,4 +82,41 @@ public class PieceManager : MonoBehaviour
             pieces[i + 8].Place(board.mAllCells[i, royaltyRow]);
         }
     }
- }
+
+    private void SetIntractive(List<BasePiece> allPiece, bool value)
+    {
+        foreach (BasePiece piece in allPiece)
+            piece.enabled = value;
+    }
+
+    public void switchSides(Color color)
+    {
+        if (!mIsKingAlive)
+        {
+            //Reset Pieces
+            ResetPiece();
+
+            //King has risen from the dead
+            mIsKingAlive = true;
+
+            //Change color to black, so white can go first again
+            color = Color.black;
+        }
+
+        bool isBlackTurn = color == Color.white ? true : false;
+
+        //Set interactivity
+        SetIntractive(mWhitePieces, !isBlackTurn);
+        SetIntractive(mBlackPieces, isBlackTurn);
+    }
+
+    public void ResetPiece()
+    {
+        foreach (BasePiece piece in mWhitePieces)
+            piece.Reset();
+
+        foreach (BasePiece piece in mWhitePieces)
+            piece.Reset();
+    }
+}
+
